@@ -1,4 +1,4 @@
-# CipherTalk
+                                                                                                                    # CipherTalk
 CipherTalk is an AI-powered end-to-end encrypted messaging app that ensures secure, private, and real-time communication. It leverages FastAPI, PostgreSQL, and WebSockets for seamless messaging, with AES/RSA encryption to protect user data. Additionally, AI-driven smart reply suggestions enhance user experience.
 
 Key Features:
