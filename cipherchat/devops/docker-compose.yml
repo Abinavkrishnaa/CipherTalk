@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:17.2
+    restart: always
+    environment:
+      POSTGRES_USER: chatuser  # Ensure the same user is used in `web`
+      POSTGRES_PASSWORD: 2003
+      POSTGRES_DB: cipherchat
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U chatuser"]  # Match the correct username
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build: .
+    working_dir: /app
+    env_file:
+      - ../.env
+    command: >
+      sh -c "until pg_isready -h db -U chatuser; do sleep 1; done &&
+             python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             daphne -b 0.0.0.0 -p 8000 cipherchat.asgi:application"
+    environment:
+      DATABASE_URL: "postgres://chatuser:2003@db:5432/cipherchat"
+    volumes:
+      - ../:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
